@@ -54,7 +54,7 @@ namespace Muse.Api.Data
                 .HasOne(p => p.Creator)
                 .WithMany(u => u.Playlists)
                 .HasForeignKey(p => p.CreatorId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Playlist>()
                 .HasOne(p => p.Movie)

@@ -128,7 +128,7 @@ namespace Muse.Api.Migrations
                     description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     isPublic = table.Column<bool>(type: "bit", nullable: false),
                     source = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     MovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -147,7 +147,7 @@ namespace Muse.Api.Migrations
                         column: x => x.CreatorId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(

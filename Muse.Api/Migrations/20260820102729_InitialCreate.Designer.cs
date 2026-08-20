@@ -12,7 +12,7 @@ using Muse.Api.Data;
 namespace Muse.Api.Migrations
 {
     [DbContext(typeof(MuseDbContext))]
-    [Migration("20260820093446_InitialCreate")]
+    [Migration("20260820102729_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -126,7 +126,7 @@ namespace Muse.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("CreatorId")
+                    b.Property<Guid?>("CreatorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("MovieId")
@@ -383,8 +383,7 @@ namespace Muse.Api.Migrations
                     b.HasOne("Muse.Api.Models.User", "Creator")
                         .WithMany("Playlists")
                         .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Muse.Api.Models.Movie", "Movie")
                         .WithMany("Playlists")

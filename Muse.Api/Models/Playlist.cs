@@ -16,8 +16,8 @@ namespace Muse.Api.Models
         [Required, MaxLength(30)]
         public string source { get; set; } = "user"; // either user or system
         [ForeignKey(nameof(Creator))]
-        public Guid CreatorId { get; set; }
-        public User Creator { get; set; } = null!;
+        public Guid? CreatorId { get; set; }
+        public User? Creator { get; set; }
         [ForeignKey(nameof(Movie))]
         public Guid MovieId { get; set; }
         public Movie Movie { get; set; } = null!;
