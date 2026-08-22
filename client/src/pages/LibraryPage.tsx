@@ -86,7 +86,7 @@ export const LibraryPage: React.FC = () => {
                                 />
                                 <div>
                                     <strong style={{ fontSize: 15, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pl.name}</strong>
-                                    <span style={{ fontSize: 12, color: '#888' }}>{pl.songs.length} Tracks • {pl.source}</span>
+                                    <span style={{ fontSize: 12, color: '#888' }}>{pl.songs.length} Tracks - {pl.source}</span>
                                 </div>
                             </Link>
                             <button
