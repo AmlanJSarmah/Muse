@@ -23,16 +23,6 @@ export const PlaylistDetail: React.FC = () => {
             .finally(() => setLoading(false));
     }, [id]);
 
-    const handleNext = () => {
-        if (!playlist || playlist.songs.length === 0) return;
-        setCurrentSongIndex((prev) => (prev + 1) % playlist.songs.length);
-    };
-
-    const handlePrev = () => {
-        if (!playlist || playlist.songs.length === 0) return;
-        setCurrentSongIndex((prev) => (prev - 1 + playlist.songs.length) % playlist.songs.length);
-    };
-
     if (loading) return <p style={{ color: '#aaa' }}>Loading playlist...</p>;
     if (error) return <p style={{ color: '#ff7676' }}>{error}</p>;
     if (!playlist) return <p style={{ color: '#aaa' }}>Playlist not found.</p>;
@@ -96,11 +86,7 @@ export const PlaylistDetail: React.FC = () => {
                 </section>
             </main>
 
-            <PlayerBar
-                currentTrack={playlist.songs[currentSongIndex] ?? null}
-                onNext={handleNext}
-                onPrev={handlePrev}
-            />
+            <PlayerBar />
         </>
     );
 };
