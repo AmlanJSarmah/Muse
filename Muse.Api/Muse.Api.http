@@ -1,15 +1,24 @@
-GET http://localhost:5235/app/
-Accept: application/json
+### Sign up
+POST http://localhost:5235/api/auth/signup
+Content-Type: application/json
 
-###
+{
+  "username": "aj",
+  "email": "aj@example.com",
+  "password": "SomeStrongPassword123!"
+}
 
-GET http://localhost:5235/app/songs-from-spotify?title=Paris Texas
-Accept: application/json
 
-### 
+### Sign in — copy the returned token
+POST http://localhost:5235/api/auth/signin
+Content-Type: application/json
+
+{
+  "email": "aj@example.com",
+  "password": "SomeStrongPassword123!"
+}
 
 
-GET http://localhost:5235/app/songs?title=Kes
-Accept: application/json
-
-### 
+### Use the token on a protected endpoint
+GET http://localhost:5235/app/songs?title=There Will Be Blood
+Authorization: Bearer JWT_TOKEN_HERE
