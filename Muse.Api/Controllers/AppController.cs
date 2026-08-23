@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Muse.Api.Services;
 
@@ -5,6 +6,7 @@ namespace Muse.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class AppController : ControllerBase
 {
    private readonly ISpotifyService _spotifyService;
