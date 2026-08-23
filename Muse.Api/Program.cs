@@ -22,6 +22,8 @@ namespace Muse.Api
             builder.Services.AddSingleton<IMusicBrainzService, MusicBrainzService>(); 
             builder.Services.AddSingleton<ISpotifyService, SpotifyService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IMusicPersistenceService, MusicPersistenceService>();
+            builder.Services.AddSingleton<IYoutubeService, YoutubeService>();
             
             // DB
             builder.Services.AddDbContext<MuseDbContext>(options =>
