@@ -15,8 +15,8 @@ namespace Muse.Api.Models
         [ForeignKey(nameof(Movie))]
         public Guid MovieId { get; set; }
         public Movie Movie { get; set; } = null!;
-        [Required, MaxLength(500)]
-        public string YoutubeUrl { get; set; } = string.Empty;
+        [ MaxLength(500)]
+        public string? YoutubeUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Genre> Genres { get; set; } = new List<Genre>();
