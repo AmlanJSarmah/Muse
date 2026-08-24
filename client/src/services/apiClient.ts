@@ -14,9 +14,11 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config) => {
     const token = localStorage.getItem('auth_token');
+
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
 });
 
@@ -26,7 +28,9 @@ const getApiError = (error: unknown, fallback: string): string => {
             | { error?: string; errors?: Record<string, string[]> }
             | undefined;
 
-        if (typeof data?.error === 'string') return data.error;
+        if (typeof data?.error === 'string') {
+            return data.error;
+        }
 
         if (data?.errors) {
             return Object.values(data.errors).flat().join(' ') || fallback;
@@ -35,36 +39,54 @@ const getApiError = (error: unknown, fallback: string): string => {
         if (error.response?.status === 401) {
             return 'Please log in to continue.';
         }
+
         if (error.response?.status === 404) {
             return 'The requested resource was not found.';
         }
     }
+
     return fallback;
 };
 
 export const authService = {
     async login(email: string, password: string): Promise<AuthResponse> {
         try {
-            const response = await apiClient.post<AuthResponse>('/api/auth/signin', {
-                email,
-                password,
-            });
+            const response = await apiClient.post<AuthResponse>(
+                '/api/auth/signin',
+                {
+                    email,
+                    password,
+                }
+            );
+
             return response.data;
         } catch (error) {
-            throw new Error(getApiError(error, 'Invalid email or password.'));
+            throw new Error(
+                getApiError(error, 'Invalid email or password.')
+            );
         }
     },
 
-    async register(username: string, email: string, password: string): Promise<AuthResponse> {
+    async register(
+        username: string,
+        email: string,
+        password: string
+    ): Promise<AuthResponse> {
         try {
-            const response = await apiClient.post<AuthResponse>('/api/auth/signup', {
-                username,
-                email,
-                password,
-            });
+            const response = await apiClient.post<AuthResponse>(
+                '/api/auth/signup',
+                {
+                    username,
+                    email,
+                    password,
+                }
+            );
+
             return response.data;
         } catch (error) {
-            throw new Error(getApiError(error, 'Unable to create the account.'));
+            throw new Error(
+                getApiError(error, 'Unable to create the account.')
+            );
         }
     },
 };
@@ -72,12 +94,21 @@ export const authService = {
 export const movieService = {
     async getSoundtrack(title: string): Promise<SoundtrackResponse> {
         try {
-            const response = await apiClient.get<SoundtrackResponse>('/app/songs', {
-                params: { title },
-            });
+            const response = await apiClient.get<SoundtrackResponse>(
+                '/app/songs',
+                {
+                    params: { title },
+                }
+            );
+
             return response.data;
         } catch (error) {
-            throw new Error(getApiError(error, `No soundtrack found for "${title}".`));
+            throw new Error(
+                getApiError(
+                    error,
+                    `No soundtrack found for "${title}".`
+                )
+            );
         }
     },
 
@@ -88,35 +119,61 @@ export const movieService = {
         songCount: number;
     }> {
         try {
-            const response = await apiClient.post('/app/songs/save', null, {
-                params: { title },
-            });
+            const response = await apiClient.post(
+                '/app/songs/save',
+                null,
+                {
+                    params: { title },
+                }
+            );
+
             return response.data;
         } catch (error) {
-            throw new Error(getApiError(error, `Unable to generate a playlist for "${title}".`));
+            throw new Error(
+                getApiError(
+                    error,
+                    `Unable to generate a playlist for "${title}".`
+                )
+            );
         }
     },
 };
 
 export const playlistService = {
-    async searchPublicPlaylists(movieTitle: string): Promise<PlaylistSearchResponse> {
+    async searchPublicPlaylists(
+        movieTitle: string
+    ): Promise<PlaylistSearchResponse> {
         try {
-            const response = await apiClient.get<PlaylistSearchResponse>(
-                '/api/playlists/search',
-                { params: { movieTitle } },
-            );
+            const response =
+                await apiClient.get<PlaylistSearchResponse>(
+                    '/api/playlists/search',
+                    {
+                        params: { movieTitle },
+                    }
+                );
+
             return response.data;
         } catch (error) {
-            throw new Error(getApiError(error, 'Unable to find public playlists.'));
+            throw new Error(
+                getApiError(
+                    error,
+                    'Unable to find public playlists.'
+                )
+            );
         }
     },
 
     async getPlaylistById(id: string): Promise<Playlist> {
         try {
-            const response = await apiClient.get<Playlist>(`/api/playlists/${id}`);
+            const response = await apiClient.get<Playlist>(
+                `/api/playlists/${id}`
+            );
+
             return response.data;
         } catch (error) {
-            throw new Error(getApiError(error, 'Unable to load playlist.'));
+            throw new Error(
+                getApiError(error, 'Unable to load playlist.')
+            );
         }
     },
 
@@ -124,24 +181,46 @@ export const playlistService = {
         try {
             await apiClient.post(`/api/playlists/${id}/save`);
         } catch (error) {
-            throw new Error(getApiError(error, 'Unable to save playlist.'));
+            throw new Error(
+                getApiError(error, 'Unable to save playlist.')
+            );
         }
     },
 
-    async setVisibility(id: string, isPublic: boolean): Promise<void> {
+    async setVisibility(
+        id: string,
+        isPublic: boolean
+    ): Promise<void> {
         try {
-            await apiClient.patch(`/api/playlists/${id}/visibility`, { isPublic });
+            await apiClient.patch(
+                `/api/playlists/${id}/visibility`,
+                { isPublic }
+            );
         } catch (error) {
-            throw new Error(getApiError(error, 'Unable to change playlist visibility.'));
+            throw new Error(
+                getApiError(
+                    error,
+                    'Unable to change playlist visibility.'
+                )
+            );
         }
     },
 
     async getMyLibrary(): Promise<LibraryResponse> {
         try {
-            const response = await apiClient.get<LibraryResponse>('/api/playlists/mine');
+            const response =
+                await apiClient.get<LibraryResponse>(
+                    '/api/playlists/mine'
+                );
+
             return response.data;
         } catch (error) {
-            throw new Error(getApiError(error, 'Unable to load your library.'));
+            throw new Error(
+                getApiError(
+                    error,
+                    'Unable to load your library.'
+                )
+            );
         }
     },
 };

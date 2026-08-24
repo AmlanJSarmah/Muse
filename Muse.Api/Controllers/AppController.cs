@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Muse.Api.Services;
 
@@ -5,15 +8,18 @@ namespace Muse.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class AppController : ControllerBase
 {
    private readonly ISpotifyService _spotifyService;
    private readonly IMusicBrainzService _musicBrainzService;
+   private readonly IMusicPersistenceService _persistenceService;
 
-   public AppController(ISpotifyService spotifyService, IMusicBrainzService musicBrainzService)
+   public AppController(ISpotifyService spotifyService, IMusicBrainzService musicBrainzService, IMusicPersistenceService persistenceService)
    {
       _spotifyService = spotifyService;
       _musicBrainzService = musicBrainzService;
+      _persistenceService = persistenceService;
    }
    
    [HttpGet]
@@ -34,12 +40,26 @@ public class AppController : ControllerBase
    }
 
    [HttpGet("songs-from-spotify")]
-   public async Task<IActionResult> GetSongsFromMovies([FromQuery] string title)
+   public async Task<IActionResult> GetSongsFromMovies([FromQuery, Required] string title)
    {
       var result = await _spotifyService.GetSoundtrackAsync(title);
 
       if (result is null) return NotFound("No soundtrack for '{title}'.");
       
       return Ok(new { movie = title, album = result.Value.AlbumName, songs = result.Value.Songs });
+   }
+   
+   [HttpPost("songs/save")]
+   public async Task<IActionResult> SaveSongsForMovie([FromQuery, Required] string title)
+   {
+      var result = await _musicBrainzService.GetSoundtrackAsync(title);
+      if (result is null)
+         return NotFound($"No soundtrack found for '{title}'.");
+
+      var (albumTitle, songs) = result.Value;
+      var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+      var playlist = await _persistenceService.SaveSoundtrackAsync(title, albumTitle, songs, userId);
+
+      return Ok(new { playlistId = playlist.Id, movie = title, album = albumTitle, songCount = songs.Count });
    }
 }
