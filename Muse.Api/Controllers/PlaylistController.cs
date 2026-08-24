@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ public class PlaylistsController : ControllerBase
 
     // show existing public playlists for a movie
     [HttpGet("search")]
-    public async Task<IActionResult> SearchByMovie([FromQuery] string movieTitle)
+    public async Task<IActionResult> SearchByMovie([FromQuery, Required] string movieTitle)
     {
         var playlists = await _db.Playlists
             .Include(p => p.Movie)
