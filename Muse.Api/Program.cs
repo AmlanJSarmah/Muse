@@ -30,6 +30,23 @@ namespace Muse.Api
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             
             builder.Services.AddControllers();
+            
+            // CORS
+            const string FrontendCorsPolicy = "FrontendCorsPolicy";
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(FrontendCorsPolicy, policy =>
+                {
+                    policy.WithOrigins(
+                            "http://localhost:3000",   // Create React App / Next.js default
+                            "http://localhost:5173"    // Vite default
+                        )
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
 
             // JWT
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -62,8 +79,7 @@ namespace Muse.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-
+            app.UseCors(FrontendCorsPolicy);
             app.MapControllers();
 
             app.Run();
