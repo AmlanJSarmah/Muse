@@ -15,10 +15,10 @@ namespace Muse.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            
+
             // Add services to the container.
             builder.Services.AddHttpClient();
-            builder.Services.AddSingleton<IMusicBrainzService, MusicBrainzService>(); 
+            builder.Services.AddSingleton<IMusicBrainzService, MusicBrainzService>();
             builder.Services.AddSingleton<ISpotifyService, SpotifyService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IMusicPersistenceService, MusicPersistenceService>();
@@ -27,10 +27,14 @@ namespace Muse.Api
 
             // DB
             builder.Services.AddDbContext<MuseDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection")));
+
             builder.Services.AddControllers();
-            
+
+            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            builder.Services.AddOpenApi();
+
             // CORS
             const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
@@ -39,8 +43,8 @@ namespace Muse.Api
                 options.AddPolicy(FrontendCorsPolicy, policy =>
                 {
                     policy.WithOrigins(
-                            "http://localhost:3000",   // Create React App / Next.js default
-                            "http://localhost:5173"    // Vite default
+                            "http://localhost:3000",
+                            "http://localhost:5173"
                         )
                         .AllowAnyHeader()
                         .AllowAnyMethod()
@@ -61,14 +65,15 @@ namespace Muse.Api
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                            Encoding.UTF8.GetBytes(
+                                builder.Configuration["Jwt:Key"]!))
                     };
                 });
 
             builder.Services.AddAuthorization();
 
             var app = builder.Build();
-           
+
             // Global Error Handling
             app.UseMiddleware<Muse.Api.Exceptions.ExceptionHandlingMiddleware>();
 
@@ -77,9 +82,11 @@ namespace Muse.Api
             {
             }
 
+            app.UseCors(FrontendCorsPolicy);
+
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors(FrontendCorsPolicy);
+
             app.MapControllers();
 
             app.Run();
