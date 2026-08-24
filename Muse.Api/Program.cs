@@ -7,7 +7,6 @@ using Muse.Api.Services;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Muse.Api.Services;
 
 namespace Muse.Api
 {
@@ -24,7 +23,8 @@ namespace Muse.Api
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IMusicPersistenceService, MusicPersistenceService>();
             builder.Services.AddSingleton<IYoutubeService, YoutubeService>();
-            
+            builder.Services.AddHttpClient<IMLService, MLService>();
+
             // DB
             builder.Services.AddDbContext<MuseDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
