@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { ApiResponse, MovieSummary, Playlist, RecommendationResponse } from '../types/api';
 import { mockPlaylists, mockPlaylist, getDynamicRecommendations } from './mockData';
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 const SAVED_STORAGE_KEY = 'user_saved_playlists';
 
 export const apiClient = axios.create({
