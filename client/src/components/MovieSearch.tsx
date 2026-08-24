@@ -1,63 +1,144 @@
-import React, { useEffect, useState } from 'react';
-import type { MovieSummary, Playlist } from '../types/api';
-import { movieService } from '../services/apiClient';
+import React, { useState } from 'react';
+import type { PlaylistSearchResponse, SoundtrackResponse } from '../types/api';
+import { movieService, playlistService } from '../services/apiClient';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { Link } from 'react-router-dom';
 
 export const MovieSearch: React.FC = () => {
     const [query, setQuery] = useState('');
-    const [movies, setMovies] = useState<MovieSummary[]>([]);
+    const [soundtrack, setSoundtrack] = useState<SoundtrackResponse | null>(null);
+    const [playlists, setPlaylists] = useState<PlaylistSearchResponse | null>(null);
     const [loading, setLoading] = useState(false);
-    const [generatingId, setGeneratingId] = useState<string | null>(null);
-    const [generatedPlaylist, setGeneratedPlaylist] = useState<Playlist | null>(null);
+    const [generating, setGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { isAuthenticated } = useAuth();
+    const { showToast } = useToast();
 
-    useEffect(() => {
-        const trimmed = query.trim();
-        if (!trimmed) { setMovies([]); setError(null); return; }
+    const search = async () => {
+        const title = query.trim();
+        if (!title) return;
 
-        const timer = window.setTimeout(async () => {
-            setLoading(true); setError(null);
-            try {
-                const response = await movieService.searchMovies(trimmed);
-                setMovies(response.data);
-            } catch {
-                setMovies([]); setError('Unable to search movies. Please try again.');
-            } finally { setLoading(false); }
-        }, 350);
-        return () => window.clearTimeout(timer);
-    }, [query]);
+        if (!isAuthenticated) {
+            setError('Please log in before searching.');
+            return;
+        }
 
-    const generatePlaylist = async (movie: MovieSummary) => {
-        setGeneratingId(movie.id); setGeneratedPlaylist(null); setError(null);
-        try { setGeneratedPlaylist(await movieService.generatePlaylist(movie.id)); }
-        catch { setError(`Unable to generate a playlist for ${movie.title}.`); }
-        finally { setGeneratingId(null); }
+        setLoading(true);
+        setError(null);
+        setSoundtrack(null);
+        setPlaylists(null);
+
+        try {
+            const [tracks, publicPlaylists] = await Promise.all([
+                movieService.getSoundtrack(title),
+                playlistService.searchPublicPlaylists(title),
+            ]);
+            setSoundtrack(tracks);
+            setPlaylists(publicPlaylists);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Unable to search.');
+        } finally {
+            setLoading(false);
+        }
     };
 
-    return <section>
-        <h2>Movie Search</h2>
-        <input
-            type="search" value={query} onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search for a movie..." aria-label="Search for a movie"
-            style={{ width: '100%', maxWidth: 620, padding: '13px 15px', borderRadius: 8, border: '1px solid #333', background: '#141414', color: '#fff', fontSize: 16, boxSizing: 'border-box' }}
-        />
-        {loading && <p style={{ color: '#aaa' }} role="status">Searching...</p>}
-        {error && <p style={{ color: '#ff7676' }}>{error}</p>}
-        {generatedPlaylist && <div style={{ marginTop: 20, padding: 16, borderRadius: 8, background: '#141414' }}>Generated: <strong>{generatedPlaylist.name}</strong></div>}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: 20, marginTop: 24 }}>
-            {movies.map((movie) => {
-                const generating = generatingId === movie.id;
-                return <article key={movie.id} style={{ background: '#141414', border: '1px solid #252525', borderRadius: 10, overflow: 'hidden' }}>
-                    <img src={movie.posterUrl} alt={`${movie.title} poster`} style={{ display: 'block', width: '100%', aspectRatio: '2 / 3', objectFit: 'cover' }} />
-                    <div style={{ padding: 14 }}>
-                        <h3 style={{ margin: '0 0 6px' }}>{movie.title}</h3>
-                        <p style={{ margin: '0 0 14px', color: '#999' }}>{movie.year}</p>
-                        <button type="button" disabled={generating} onClick={() => generatePlaylist(movie)} style={{ width: '100%', padding: '10px 12px', border: 0, borderRadius: 6, background: generating ? '#166b36' : '#1db954', color: '#000', fontWeight: 700, cursor: generating ? 'wait' : 'pointer' }}>
-                            {generating ? '⟳ Generating...' : 'Generate Playlist'}
+    const generatePlaylist = async () => {
+        if (!soundtrack) return;
+        setGenerating(true);
+
+        try {
+            const result = await movieService.generatePlaylist(soundtrack.movie);
+            showToast(`Playlist created with ${result.songCount} songs.`, 'success');
+            window.location.href = `/playlist/${result.playlistId}`;
+        } catch (err) {
+            showToast(err instanceof Error ? err.message : 'Unable to generate playlist.', 'error');
+        } finally {
+            setGenerating(false);
+        }
+    };
+
+    return (
+        <section className="page-container">
+            <h2>Movie Search</h2>
+
+            <div style={{ display: 'flex', gap: 10, maxWidth: 620, marginTop: 16 }}>
+                <input
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') void search(); }}
+                    placeholder="Enter a movie title..."
+                    aria-label="Movie title"
+                    style={{ flex: 1, padding: '13px 15px', borderRadius: 8, border: '1px solid #333', background: '#141414', color: '#fff', fontSize: 16 }}
+                />
+                <button
+                    type="button"
+                    onClick={() => void search()}
+                    disabled={loading || !query.trim()}
+                    style={{ padding: '0 20px', border: 0, borderRadius: 8, background: '#1db954', color: '#000', fontWeight: 700 }}
+                >
+                    {loading ? 'Searching...' : 'Search'}
+                </button>
+            </div>
+
+            {!isAuthenticated && (
+                <p style={{ color: '#aaa', marginTop: 12 }}>Log in to use the Muse soundtrack API.</p>
+            )}
+
+            {error && <p style={{ color: '#ff7676', marginTop: 16 }}>{error}</p>}
+
+            {soundtrack && (
+                <div style={{ marginTop: 28 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <div>
+                            <h3>{soundtrack.movie}</h3>
+                            <p style={{ color: '#aaa', marginTop: 4 }}>{soundtrack.album}</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => void generatePlaylist()}
+                            disabled={generating}
+                            style={{ padding: '10px 16px', border: 0, borderRadius: 8, background: '#1db954', color: '#000', fontWeight: 700 }}
+                        >
+                            {generating ? 'Generating...' : 'Generate Playlist'}
                         </button>
                     </div>
-                </article>;
-            })}
-        </div>
-        {!loading && query.trim() && movies.length === 0 && !error && <p style={{ color: '#aaa', marginTop: 24 }}>No movies found.</p>}
-    </section>;
+
+                    <div style={{ marginTop: 20, display: 'grid', gap: 8 }}>
+                        {soundtrack.songs.map((song, index) => (
+                            <div key={`${song.title}-${index}`} style={{ padding: 14, background: '#141414', borderRadius: 8 }}>
+                                <strong>{index + 1}. {song.title}</strong>
+                                <div style={{ color: '#aaa', marginTop: 4 }}>{song.artist}</div>
+                                <div style={{ color: '#777', fontSize: 12, marginTop: 5 }}>{song.genres.join(' • ')}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {playlists && (
+                <section style={{ marginTop: 36 }}>
+                    <h3>Public Playlists for {playlists.movie}</h3>
+                    {playlists.playlists.length === 0 ? (
+                        <p style={{ color: '#aaa', marginTop: 12 }}>No public playlists exist yet. Generate one above.</p>
+                    ) : (
+                        <div style={{ display: 'grid', gap: 10, marginTop: 14 }}>
+                            {playlists.playlists.map((playlist) => (
+                                <div key={playlist.id} style={{ background: '#141414', borderRadius: 8, padding: 16, display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'center' }}>
+                                    <div>
+                                        <strong>{playlist.name}</strong>
+                                        <div style={{ color: '#888', fontSize: 13, marginTop: 5 }}>
+                                            by {playlist.creatorUsername} • {playlist.songCount} songs
+                                        </div>
+                                    </div>
+                                    <Link to={`/playlist/${playlist.id}`} style={{ color: '#1db954' }}>Open</Link>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </section>
+            )}
+        </section>
+    );
 };
