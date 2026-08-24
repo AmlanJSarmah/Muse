@@ -29,3 +29,11 @@ dotnet user-secrets set "Spotify:ClientSecret" "your-client-secret"
 dotnet user-secrets set "MusicBrainz:ContactEmail" "your-real-email@example.com"
 ```
 **Note** : Replace the spotify client id, secret and email with original values
+
+### Setting up JWT  
+Run the following commands in your terminal
+```shell
+dotnet user-secrets set "Jwt:Key" "$(openssl rand -base64 48)"
+dotnet user-secrets set "Jwt:Issuer" "MuseApi"
+dotnet user-secrets set "Jwt:Audience" "MuseApiUsers"
+```
