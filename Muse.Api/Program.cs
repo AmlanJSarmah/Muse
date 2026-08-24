@@ -17,10 +17,44 @@ namespace Muse.Api
             builder.Services.AddSingleton<ISpotifyService, SpotifyService>();
 
             builder.Services.AddControllers();
+<<<<<<< Updated upstream
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+=======
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("MuseFrontend", policy =>
+                {
+                    policy
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
+            // JWT
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                    };
+                });
+
+            builder.Services.AddAuthorization();
+>>>>>>> Stashed changes
 
             var app = builder.Build();
+            app.UseCors("MuseFrontend");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

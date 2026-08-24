@@ -1,35 +1,44 @@
-export interface ApiResponse<T> {
-    data: T[];
-    pagination: {
-        page: number;
-        pageSize: number;
-        totalCount: number;
-        totalPages: number;
-    };
+export interface AuthResponse {
+    token: string;
+    expiresAt: string;
+    username: string;
+    email: string;
 }
 
-export interface ApiError {
-    error: {
-        code: string;
-        message: string;
-        details: unknown | null;
-    };
-}
-
-export interface MovieSummary {
-    id: string;
-    title: string;
-    year: number;
-    posterUrl: string;
-}
-
-export interface Song {
+export interface SoundtrackSong {
     title: string;
     artist: string;
-    youtubeUrl: string;
-    youtubeVideoId: string;
-    durationSeconds: number;
-    thumbnailUrl: string | null;
+    genres: string[];
+}
+
+export interface SoundtrackResponse {
+    movie: string;
+    album: string;
+    songs: SoundtrackSong[];
+}
+
+export interface PlaylistSummary {
+    id: string;
+    name: string;
+    creatorUsername: string;
+    source: string;
+    songCount: number;
+    createdAt: string;
+}
+
+export interface PlaylistSearchResponse {
+    movie: string;
+    playlists: PlaylistSummary[];
+}
+
+export interface PlaylistSong {
+    title: string;
+    artist: string;
+    genres: string[];
+    youtubeUrl: string | null;
+    youtubeVideoId?: string;
+    durationSeconds?: number;
+    thumbnailUrl?: string | null;
 }
 
 export interface Playlist {
@@ -37,25 +46,20 @@ export interface Playlist {
     name: string;
     description: string;
     isPublic: boolean;
-    source: 'movie' | 'user' | string;
-    creatorId: string;
-    movieId: string | null;
-    songs: Song[];
-    createdAt: string;
-    updatedAt: string;
-    movie?: MovieSummary;
+    movieTitle: string;
+    songs: PlaylistSong[];
 }
 
-export interface RecommendationItem {
-    type: 'movie' | 'playlist' | 'song';
+export interface LibraryPlaylist {
     id: string;
-    score: number;
-    reason: string;
-    item: MovieSummary | Playlist | Song;
+    name: string;
+    creatorUsername: string;
+    source: string;
+    songCount: number;
+    createdAt: string;
 }
 
-export interface RecommendationResponse {
-    recommendations: RecommendationItem[];
-    generatedAt: string;
-    modelVersion: string;
+export interface LibraryResponse {
+    created: LibraryPlaylist[];
+    saved: LibraryPlaylist[];
 }

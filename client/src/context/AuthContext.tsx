@@ -2,9 +2,11 @@ import { createContext, useContext, useState, type FC, type PropsWithChildren } 
 
 interface AuthContextValue {
     token: string | null;
-    userId: string | null;
+    username: string | null;
+    email: string | null;
+    expiresAt: string | null;
     isAuthenticated: boolean;
-    login: (token: string, userId: string) => void;
+    login: (token: string, username: string, email: string, expiresAt: string) => void;
     logout: () => void;
 }
 
@@ -12,42 +14,41 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     const [token, setToken] = useState<string | null>(localStorage.getItem('auth_token'));
-    const [userId, setUserId] = useState<string | null>(localStorage.getItem('user_id'));
+    const [username, setUsername] = useState<string | null>(localStorage.getItem('username'));
+    const [email, setEmail] = useState<string | null>(localStorage.getItem('email'));
+    const [expiresAt, setExpiresAt] = useState<string | null>(localStorage.getItem('token_expires_at'));
 
-    const login = (newToken: string, newUserId: string) => {
+    const login = (newToken: string, newUsername: string, newEmail: string, newExpiresAt: string) => {
         localStorage.setItem('auth_token', newToken);
-        localStorage.setItem('user_id', newUserId);
+        localStorage.setItem('username', newUsername);
+        localStorage.setItem('email', newEmail);
+        localStorage.setItem('token_expires_at', newExpiresAt);
         setToken(newToken);
-        setUserId(newUserId);
+        setUsername(newUsername);
+        setEmail(newEmail);
+        setExpiresAt(newExpiresAt);
     };
 
     const logout = () => {
         localStorage.removeItem('auth_token');
-        localStorage.removeItem('user_id');
+        localStorage.removeItem('username');
+        localStorage.removeItem('email');
+        localStorage.removeItem('token_expires_at');
         setToken(null);
-        setUserId(null);
+        setUsername(null);
+        setEmail(null);
+        setExpiresAt(null);
     };
 
     return (
-        <AuthContext.Provider
-            value={{
-                token,
-                userId,
-                isAuthenticated: !!token,
-                login,
-                logout,
-            }}
-        >
+        <AuthContext.Provider value={{ token, username, email, expiresAt, isAuthenticated: !!token, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
+    if (!context) throw new Error('useAuth must be used within an AuthProvider');
     return context;
 };
