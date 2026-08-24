@@ -1,5 +1,8 @@
+@host = http://localhost:5235
+@movieTitle = There Will Be Blood
+
 ### Sign up
-POST http://localhost:5235/api/auth/signup
+POST {{host}}/api/auth/signup
 Content-Type: application/json
 
 {
@@ -8,9 +11,9 @@ Content-Type: application/json
   "password": "SomeStrongPassword123!"
 }
 
-
-### Sign in — copy the returned token
-POST http://localhost:5235/api/auth/signin
+### Sign in — auto-captures the token into {{authToken}} for every request below
+# @name signin
+POST {{host}}/api/auth/signin
 Content-Type: application/json
 
 {
@@ -18,11 +21,89 @@ Content-Type: application/json
   "password": "SomeStrongPassword123!"
 }
 
+> {%
+    client.global.set("authToken", response.body.token);
+%}
 
 ### Use the token on a protected endpoint
-GET http://localhost:5235/app/songs?title=There Will Be Blood
-Authorization: Bearer JWT_TOKEN_HERE
+GET {{host}}/app/songs?title={{movieTitle}}
+Authorization: Bearer {{authToken}}
 
-### Create a playlist
-POST http://localhost:5235/app/songs/save?title=There Will Be Blood
-Authorization: Bearer JWT_TOKEN_HERE
+### Create a playlist (generate) — also captures {{playlistId}} for requests below
+# @name generate
+POST {{host}}/app/songs/save?title={{movieTitle}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.global.set("playlistId", response.body.playlistId);
+%}
+
+### Search for existing public playlists for this movie
+GET {{host}}/api/playlists/search?movieTitle={{movieTitle}}
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### Load the full playlist contents (songs, artists, genres, YouTube links)
+GET {{host}}/api/playlists/{{playlistId}}
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### Save (bookmark) this playlist to your own account
+POST {{host}}/api/playlists/{{playlistId}}/save
+Authorization: Bearer {{authToken}}
+
+### Save it again — should return 409 Conflict (already saved)
+POST {{host}}/api/playlists/{{playlistId}}/save
+Authorization: Bearer {{authToken}}
+
+### Make the generated playlist private
+PATCH {{host}}/api/playlists/{{playlistId}}/visibility
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "isPublic": false
+}
+
+### Search again — should now be empty (private playlists don't show in search)
+GET {{host}}/api/playlists/search?movieTitle={{movieTitle}}
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### Confirm the creator can still load their own private playlist directly
+GET {{host}}/api/playlists/{{playlistId}}
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### Make it public again
+PATCH {{host}}/api/playlists/{{playlistId}}/visibility
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "isPublic": true
+}
+
+### Try changing visibility as a DIFFERENT user — should return 403 Forbidden
+# Sign up + sign in as a second user first, then paste their token below.
+PATCH {{host}}/api/playlists/{{playlistId}}/visibility
+Authorization: Bearer PASTE_OTHER_USERS_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "isPublic": false
+}
+
+### Load a playlist that doesn't exist — should return 404
+GET {{host}}/api/playlists/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+### Search for a movie with no soundtrack — should return an empty playlists array
+GET {{host}}/api/playlists/search?movieTitle=Some Nonexistent Movie Title XYZ
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### Get all playlists tied to the current user — created and saved
+GET {{host}}/api/playlists/mine
+Authorization: Bearer {{authToken}}
+Accept: application/json
