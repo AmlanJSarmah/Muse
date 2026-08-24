@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Muse.Api.Services;
@@ -55,7 +56,8 @@ public class AppController : ControllerBase
          return NotFound($"No soundtrack found for '{title}'.");
 
       var (albumTitle, songs) = result.Value;
-      var playlist = await _persistenceService.SaveSoundtrackAsync(title, albumTitle, songs);
+      var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+      var playlist = await _persistenceService.SaveSoundtrackAsync(title, albumTitle, songs, userId);
 
       return Ok(new { playlistId = playlist.Id, movie = title, album = albumTitle, songCount = songs.Count });
    }
