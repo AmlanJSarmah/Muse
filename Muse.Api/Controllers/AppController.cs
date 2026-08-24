@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Muse.Api.Services;
@@ -38,7 +40,7 @@ public class AppController : ControllerBase
    }
 
    [HttpGet("songs-from-spotify")]
-   public async Task<IActionResult> GetSongsFromMovies([FromQuery] string title)
+   public async Task<IActionResult> GetSongsFromMovies([FromQuery, Required] string title)
    {
       var result = await _spotifyService.GetSoundtrackAsync(title);
 
@@ -48,14 +50,15 @@ public class AppController : ControllerBase
    }
    
    [HttpPost("songs/save")]
-   public async Task<IActionResult> SaveSongsForMovie([FromQuery] string title)
+   public async Task<IActionResult> SaveSongsForMovie([FromQuery, Required] string title)
    {
       var result = await _musicBrainzService.GetSoundtrackAsync(title);
       if (result is null)
          return NotFound($"No soundtrack found for '{title}'.");
 
       var (albumTitle, songs) = result.Value;
-      var playlist = await _persistenceService.SaveSoundtrackAsync(title, albumTitle, songs);
+      var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+      var playlist = await _persistenceService.SaveSoundtrackAsync(title, albumTitle, songs, userId);
 
       return Ok(new { playlistId = playlist.Id, movie = title, album = albumTitle, songCount = songs.Count });
    }
