@@ -4,5 +4,5 @@ namespace Muse.Api.Services;
 
 public interface IMusicPersistenceService
 {
-    Task<Playlist> SaveSoundtrackAsync(string movieName, string albumTitle, List<SongInfo> songs);
+    Task<Playlist> SaveSoundtrackAsync(string movieName, string albumTitle, List<SongInfo> songs, Guid? creatorId);
 }

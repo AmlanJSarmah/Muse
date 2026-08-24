@@ -15,7 +15,7 @@ public class MusicPersistenceService : IMusicPersistenceService
       _youtubeService = youtubeService;
    }
    
-   public async Task<Playlist> SaveSoundtrackAsync(string movieName, string albumTitle, List<SongInfo> songs)
+   public async Task<Playlist> SaveSoundtrackAsync(string movieName, string albumTitle, List<SongInfo> songs, Guid? creatorId)
    {
       var movie = await FindOrCreateMovieAsync(movieName);
 
@@ -26,7 +26,7 @@ public class MusicPersistenceService : IMusicPersistenceService
          description = $"Auto-generated soundtrack for {movieName}",
          isPublic = true,
          source = "system",
-         CreatorId = null, // requires the nullable fix above
+         CreatorId = creatorId,
          MovieId = movie.id,
          CreatedAt = DateTime.UtcNow,
          UpdatedAt = DateTime.UtcNow
