@@ -16,7 +16,7 @@ namespace Muse.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
             // Add services to the container.
             builder.Services.AddHttpClient();
             builder.Services.AddSingleton<IMusicBrainzService, MusicBrainzService>(); 
@@ -51,6 +51,9 @@ namespace Muse.Api
             builder.Services.AddAuthorization();
 
             var app = builder.Build();
+           
+            // Global Error Handling
+            app.UseMiddleware<Muse.Api.Exceptions.ExceptionHandlingMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
