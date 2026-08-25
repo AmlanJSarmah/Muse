@@ -38,11 +38,11 @@ namespace Muse.Api.Controllers
                 });
             }
 
-            /*
-             * Get all movies and their genres.
-             */
             var movies = await _db.Movies
                 .Include(m => m.Genres)
+                .Include(m => m.Songs)
+                    .ThenInclude(s => s.Artist)
+                .AsNoTracking()
                 .ToListAsync();
 
             var mlMovies = movies
@@ -56,43 +56,50 @@ namespace Muse.Api.Controllers
 
                     Genres = movie.Genres
                         .Select(g => g.Name)
-                        .Where(name => !string.IsNullOrWhiteSpace(name))
+                        .Where(name =>
+                            !string.IsNullOrWhiteSpace(name))
+                        .Distinct()
+                        .ToList(),
+
+                    Artists = movie.Songs
+                        .Where(s => s.Artist != null)
+                        .Select(s => s.Artist.Name)
+                        .Where(name =>
+                            !string.IsNullOrWhiteSpace(name))
                         .Distinct()
                         .ToList()
                 })
                 .ToList();
 
-            /*
-             * Send the entire movie catalogue to Python.
-             */
             var request = new MLMovieRequestDto
             {
                 Movies = mlMovies
             };
 
-            var mlResult =
-                await _mlService.GetRecommendationsAsync(request);
 
-            /*
-             * Find the recommendation list
-             * for the requested movie.
-             */
+            var mlResult =
+                await _mlService.GetRecommendationsAsync(
+                    request
+                );
+
             var movieRecommendations =
                 mlResult.FirstOrDefault(
                     x => x.MovieId == movieId
                 );
 
+
             if (movieRecommendations == null)
             {
                 return Ok(new
                 {
-                    recommendations = new List<object>()
+                    recommendations = new List<object>(),
+
+                    generatedAt = DateTime.UtcNow,
+
+                    modelVersion = "tfidf-v1"
                 });
             }
 
-            /*
-             * Get the actual movie information from SQL Server.
-             */
             var recommendedIds =
                 movieRecommendations.Recommendations
                     .Select(x => x.MovieId)
@@ -100,20 +107,21 @@ namespace Muse.Api.Controllers
 
             var recommendedMovies =
                 await _db.Movies
-                    .Where(m => recommendedIds.Contains(m.id))
+                    .Where(m =>
+                        recommendedIds.Contains(m.id))
+                    .AsNoTracking()
                     .ToListAsync();
 
-            /*
-             * Combine ML score with database movie information.
-             */
             var recommendations =
                 movieRecommendations.Recommendations
                     .Join(
                         recommendedMovies,
 
-                        recommendation => recommendation.MovieId,
+                        recommendation =>
+                            recommendation.MovieId,
 
-                        movie => movie.id,
+                        movie =>
+                            movie.id,
 
                         (recommendation, movie) => new
                         {
@@ -129,21 +137,27 @@ namespace Muse.Api.Controllers
                             item = new
                             {
                                 id = movie.id,
+
                                 title = movie.Title,
+
                                 year = movie.Year,
+
                                 posterUrl = movie.PosterUrl
                             }
                         })
-                    .OrderByDescending(x => x.score)
+                    .OrderByDescending(
+                        x => x.score)
                     .ToList();
 
             return Ok(new
             {
                 recommendations,
 
-                generatedAt = DateTime.UtcNow,
+                generatedAt =
+                    DateTime.UtcNow,
 
-                modelVersion = "tfidf-v1"
+                modelVersion =
+                    "tfidf-v1"
             });
         }
     }
