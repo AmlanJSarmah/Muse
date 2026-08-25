@@ -23,7 +23,6 @@ namespace Muse.Api
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IMusicPersistenceService, MusicPersistenceService>();
             builder.Services.AddSingleton<IYoutubeService, YoutubeService>();
-            builder.Services.AddHttpClient<IMLService, MLService>();
             builder.Services.AddSingleton<ITmdbService, TmdbService>();
 
             // DB
