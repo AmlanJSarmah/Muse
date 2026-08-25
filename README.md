@@ -21,12 +21,13 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,
 ```
 **Note** : Make sure to change the username and password in the above connection string. 
 
-### Spotify and MusicBrainz API Settings
+### Spotify, YouTube and MusicBrainz API Settings
 Make sure to run the following commands
 ```shell
 dotnet user-secrets set "Spotify:ClientId" "your-client-id"
 dotnet user-secrets set "Spotify:ClientSecret" "your-client-secret"
 dotnet user-secrets set "MusicBrainz:ContactEmail" "your-real-email@example.com"
+dotnet user-secrets set "YouTube:ApiKey" "your-api-key"
 ```
 **Note** : Replace the spotify client id, secret and email with original values
 
