@@ -9,5 +9,7 @@ namespace Muse.Api.Dtos
         public int Year { get; set; }
 
         public List<string> Genres { get; set; } = new();
+
+        public List<string> Artists { get; set; } = new();
     }
 }
