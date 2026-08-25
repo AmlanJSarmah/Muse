@@ -8,11 +8,13 @@ public class MusicPersistenceService : IMusicPersistenceService
 {
    private readonly MuseDbContext _db;
    private readonly IYoutubeService _youtubeService;
+   private readonly ITmdbService _tmdbService;
 
-   public MusicPersistenceService(MuseDbContext db, IYoutubeService youtubeService)
+   public MusicPersistenceService(MuseDbContext db, IYoutubeService youtubeService, ITmdbService tmdbService)
    {
       _db = db;
       _youtubeService = youtubeService;
+      _tmdbService = tmdbService;
    }
    
    public async Task<Playlist> SaveSoundtrackAsync(string movieName, string albumTitle, List<SongInfo> songs, Guid? creatorId)
@@ -66,12 +68,32 @@ public class MusicPersistenceService : IMusicPersistenceService
 
    private async Task<Movie> FindOrCreateMovieAsync(string title)
    {
-      var existing = await _db.Movies.FirstOrDefaultAsync(m => m.Title == title);
-      if (existing != null) return existing;
+      var existing = await _db.Movies.Include(m => m.Genres).FirstOrDefaultAsync(m => m.Title == title);
+      if (existing != null) return existing; // don't re-fetch TMDb metadata for a movie we already have
 
-      var movie = new Movie { id = Guid.NewGuid(), Title = title, Year = 0, PosterUrl = "", CreatedAt = DateTime.UtcNow };
+      var metadata = await _tmdbService.GetMovieMetadataAsync(title);
+
+      var movie = new Movie
+      {
+         id = Guid.NewGuid(),
+         Title = title,
+         Year = metadata?.Year ?? 0,
+         PosterUrl = metadata?.PosterUrl ?? "",
+         CreatedAt = DateTime.UtcNow
+      };
       _db.Movies.Add(movie);
       await _db.SaveChangesAsync();
+
+      if (metadata != null)
+      {
+         foreach (var genreName in metadata.Genres)
+         {
+            var genre = await FindOrCreateGenreAsync(genreName); // already exists in this file — reused as-is
+            movie.Genres.Add(genre);
+         }
+         await _db.SaveChangesAsync();
+      }
+
       return movie;
    }
    

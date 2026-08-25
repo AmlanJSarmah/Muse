@@ -172,4 +172,29 @@ public class PlaylistsController : ControllerBase
 
         return Ok(new { message = "Playlist removed from your saved list." });
     }
+    
+    [HttpGet("mine/movie-info")]
+    public async Task<IActionResult> GetMyPlaylistMovieInfo()
+    {
+        var userId = GetCurrentUserId();
+
+        var created = await _db.Playlists
+            .Include(p => p.Movie)
+            .ThenInclude(m => m.Genres)
+            .Where(p => p.CreatorId == userId)
+            .Select(p => new MovieGenreInfoDto(
+                p.Movie.Title, p.Movie.Genres.Select(g => g.Name).ToList()))
+            .ToListAsync();
+
+        var saved = await _db.SavedPlaylists
+            .Include(sp => sp.Playlist)
+            .ThenInclude(p => p.Movie)
+            .ThenInclude(m => m.Genres)
+            .Where(sp => sp.UserId == userId)
+            .Select(sp => new MovieGenreInfoDto(
+                sp.Playlist.Movie.Title, sp.Playlist.Movie.Genres.Select(g => g.Name).ToList()))
+            .ToListAsync();
+
+        return Ok(new MyMovieGenreInfoResponse(created, saved));
+    }
 }

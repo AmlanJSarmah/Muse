@@ -5,3 +5,5 @@ public record SongDetailDto(string Title, string Artist, List<string> Genres, st
 public record PlaylistDetailDto(Guid Id, string Name, string? Description, bool IsPublic, string MovieTitle, List<SongDetailDto> Songs);
 public record SetVisibilityRequest(bool IsPublic);
 public record MyPlaylistsResponse(List<PlaylistSummaryDto> Created, List<PlaylistSummaryDto> Saved);
+public record MovieGenreInfoDto(string MovieTitle, List<string> Genres);
+public record MyMovieGenreInfoResponse(List<MovieGenreInfoDto> Created, List<MovieGenreInfoDto> Saved);
