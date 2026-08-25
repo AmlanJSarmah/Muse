@@ -115,3 +115,8 @@ Authorization: Bearer {{authToken}}
 ### Unsave it again — should return 404 (wasn't saved to begin with)
 DELETE {{host}}/api/playlists/{{playlistId}}/save
 Authorization: Bearer {{authToken}}
+
+### Get movie name + genre for the current user's created and saved playlists
+GET {{host}}/api/playlists/mine/movie-info
+Authorization: Bearer {{authToken}}
+Accept: application/json
