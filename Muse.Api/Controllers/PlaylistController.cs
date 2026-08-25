@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Muse.Api.Data;
 using Muse.Api.Dtos;
 using Muse.Api.Models;
+using Muse.Api.Services;
 
 namespace Muse.Api.Controllers;
 
@@ -15,10 +16,12 @@ namespace Muse.Api.Controllers;
 public class PlaylistsController : ControllerBase
 {
     private readonly MuseDbContext _db;
+    private readonly ITmdbService _tmdbService;
 
-    public PlaylistsController(MuseDbContext db)
+    public PlaylistsController(MuseDbContext db, ITmdbService tmdbService)
     {
         _db = db;
+        _tmdbService = tmdbService;
     }
 
     // show existing public playlists for a movie
@@ -178,23 +181,36 @@ public class PlaylistsController : ControllerBase
     {
         var userId = GetCurrentUserId();
 
-        var created = await _db.Playlists
-            .Include(p => p.Movie)
-            .ThenInclude(m => m.Genres)
+        var createdMovies = await _db.Playlists
+            .Include(p => p.Movie).ThenInclude(m => m.Genres)
             .Where(p => p.CreatorId == userId)
-            .Select(p => new MovieGenreInfoDto(
-                p.Movie.Title, p.Movie.Genres.Select(g => g.Name).ToList()))
+            .Select(p => p.Movie)
+            .Distinct()
             .ToListAsync();
 
-        var saved = await _db.SavedPlaylists
-            .Include(sp => sp.Playlist)
-            .ThenInclude(p => p.Movie)
-            .ThenInclude(m => m.Genres)
+        var savedMovies = await _db.SavedPlaylists
+            .Include(sp => sp.Playlist).ThenInclude(p => p.Movie).ThenInclude(m => m.Genres)
             .Where(sp => sp.UserId == userId)
-            .Select(sp => new MovieGenreInfoDto(
-                sp.Playlist.Movie.Title, sp.Playlist.Movie.Genres.Select(g => g.Name).ToList()))
+            .Select(sp => sp.Playlist.Movie)
+            .Distinct()
             .ToListAsync();
 
-        return Ok(new MyMovieGenreInfoResponse(created, saved));
+        var created = new List<RecommendationMovieInfoDto>();
+        foreach (var movie in createdMovies)
+        {
+            var cast = await _tmdbService.GetTopCastAsync(movie.Title);
+            created.Add(new RecommendationMovieInfoDto(
+                movie.id, movie.Title, movie.Year, movie.Genres.Select(g => g.Name).ToList(), cast));
+        }
+
+        var saved = new List<RecommendationMovieInfoDto>();
+        foreach (var movie in savedMovies)
+        {
+            var cast = await _tmdbService.GetTopCastAsync(movie.Title);
+            saved.Add(new RecommendationMovieInfoDto(
+                movie.id, movie.Title, movie.Year, movie.Genres.Select(g => g.Name).ToList(), cast));
+        }
+
+        return Ok(new MyRecommendationInfoResponse(created, saved));
     }
 }

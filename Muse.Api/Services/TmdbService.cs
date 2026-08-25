@@ -57,4 +57,37 @@ public class TmdbService : ITmdbService
 
         return new MovieMetadata(year, posterUrl, genres);
     }
+    
+    
+    public async Task<List<string>> GetTopCastAsync(string movieTitle)
+    {
+        var client = _httpClientFactory.CreateClient();
+        var apiKey = _config["Tmdb:ApiKey"];
+
+        var searchUrl = $"https://api.themoviedb.org/3/search/movie?api_key={apiKey}&query={Uri.EscapeDataString(movieTitle)}";
+        var searchResponse = await client.GetAsync(searchUrl);
+        if (!searchResponse.IsSuccessStatusCode)
+            return new List<string>(); // fail soft — missing cast shouldn't break the whole response
+
+        var searchJson = JsonSerializer.Deserialize<JsonElement>(await searchResponse.Content.ReadAsStringAsync());
+        var results = searchJson.GetProperty("results");
+        if (results.GetArrayLength() == 0)
+            return new List<string>();
+
+        var movieId = results[0].GetProperty("id").GetInt32();
+
+        var creditsUrl = $"https://api.themoviedb.org/3/movie/{movieId}/credits?api_key={apiKey}";
+        var creditsResponse = await client.GetAsync(creditsUrl);
+        if (!creditsResponse.IsSuccessStatusCode)
+            return new List<string>();
+
+        var creditsJson = JsonSerializer.Deserialize<JsonElement>(await creditsResponse.Content.ReadAsStringAsync());
+        var cast = creditsJson.GetProperty("cast");
+
+        return cast.EnumerateArray()
+            .Take(5) // top-billed cast only, ordered by TMDb's own "order" field
+            .Select(actor => actor.GetProperty("name").GetString() ?? "")
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .ToList();
+    }
 }
