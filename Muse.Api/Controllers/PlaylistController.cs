@@ -155,4 +155,21 @@ public class PlaylistsController : ControllerBase
 
         return Ok(new MyPlaylistsResponse(created, saved));
     }
+    
+    [HttpDelete("{id:guid}/save")]
+    public async Task<IActionResult> UnsavePlaylist(Guid id)
+    {
+        var userId = GetCurrentUserId();
+
+        var savedEntry = await _db.SavedPlaylists
+            .FirstOrDefaultAsync(sp => sp.UserId == userId && sp.PlaylistId == id);
+
+        if (savedEntry is null)
+            return NotFound("This playlist isn't in your saved list.");
+
+        _db.SavedPlaylists.Remove(savedEntry);
+        await _db.SaveChangesAsync();
+
+        return Ok(new { message = "Playlist removed from your saved list." });
+    }
 }

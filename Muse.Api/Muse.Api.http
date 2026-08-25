@@ -6,7 +6,7 @@ POST {{host}}/api/auth/signup
 Content-Type: application/json
 
 {
-  "username": "aj",
+  "username": "ajs",
   "email": "aj@example.com",
   "password": "SomeStrongPassword123!"
 }
@@ -107,3 +107,11 @@ Accept: application/json
 GET {{host}}/api/playlists/mine
 Authorization: Bearer {{authToken}}
 Accept: application/json
+
+### Unsave a playlist
+DELETE {{host}}/api/playlists/{{playlistId}}/save
+Authorization: Bearer {{authToken}}
+
+### Unsave it again — should return 404 (wasn't saved to begin with)
+DELETE {{host}}/api/playlists/{{playlistId}}/save
+Authorization: Bearer {{authToken}}
