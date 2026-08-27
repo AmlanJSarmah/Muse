@@ -320,6 +320,19 @@ Returns everything tied to the current user: playlists they **created** and play
   ]
 }
 ```
+---
+
+### `DELETE /api/playlists/{playlistId}`
+Deltes a playlist
+
+**Auth required** Yes
+
+**Response - `200 OK`**
+```json
+{
+  "message" : "Playlist deleted successfully."
+}
+```
 
 ---
 
