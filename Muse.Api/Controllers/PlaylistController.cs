@@ -175,6 +175,31 @@ public class PlaylistsController : ControllerBase
 
         return Ok(new { message = "Playlist removed from your saved list." });
     }
+
+    // Delete a playlist — creator only
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeletePlaylist(Guid id)
+    {
+        var userId = GetCurrentUserId();
+
+        var playlist = await _db.Playlists
+            .Include(p => p.SavedPlaylists)
+            .Include(p => p.PlaylistSongs)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (playlist is null)
+            return NotFound("Playlist not found.");
+
+        if (playlist.CreatorId != userId)
+            return Forbid();
+
+        _db.SavedPlaylists.RemoveRange(playlist.SavedPlaylists);
+        _db.PlaylistSongs.RemoveRange(playlist.PlaylistSongs);
+        _db.Playlists.Remove(playlist);
+        await _db.SaveChangesAsync();
+
+        return Ok(new { message = "Playlist deleted successfully." });
+    }
     
     [HttpGet("mine/movie-info")]
     public async Task<IActionResult> GetMyPlaylistMovieInfo()

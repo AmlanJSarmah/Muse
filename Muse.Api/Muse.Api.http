@@ -120,3 +120,15 @@ Authorization: Bearer {{authToken}}
 GET {{host}}/api/playlists/mine/movie-info
 Authorization: Bearer {{authToken}}
 Accept: application/json
+
+### Delete a playlist — creator only (also deletes associated songs and bookmarks)
+DELETE {{host}}/api/playlists/{{playlistId}}
+Authorization: Bearer {{authToken}}
+
+### Try deleting a playlist as a DIFFERENT user — should return 403 Forbidden
+DELETE {{host}}/api/playlists/{{playlistId}}
+Authorization: Bearer PASTE_OTHER_USERS_TOKEN_HERE
+
+### Try deleting a nonexistent playlist — should return 404 Not Found
+DELETE {{host}}/api/playlists/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
