@@ -63,3 +63,38 @@ export interface LibraryResponse {
     created: LibraryPlaylist[];
     saved: LibraryPlaylist[];
 }
+
+
+export interface RecommendationMovieInfo {
+    movieId: string;
+    movieTitle: string;
+    year: number;
+    genres: string[];
+    artists: string[];
+}
+
+export interface MyRecommendationInfoResponse {
+    created: RecommendationMovieInfo[];
+    saved: RecommendationMovieInfo[];
+}
+
+
+export interface MovieRecommendation {
+    movieName: string;
+    year: number;
+    genres: string[];
+    artists: string[];
+    score: number;
+}
+
+
+export interface RecommendationGroup {
+    movieId: string;
+    movieName: string;
+    recommendations: MovieRecommendation[];
+}
+
+
+export interface RecommendationResponse {
+    recommendations: RecommendationGroup[];
+}
