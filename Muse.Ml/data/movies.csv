@@ -1,51 +1,21 @@
-MovieId,Title,Year,Genres,Artists
-00000000-0000-0000-0000-000000000001,There Will Be Blood,2007,Drama,Daniel Day-Lewis|Paul Dano
-00000000-0000-0000-0000-000000000002,Paris Texas,1984,Drama|Romance,Harry Dean Stanton|Nastassja Kinski
-00000000-0000-0000-0000-000000000003,The Godfather,1972,Crime|Drama,Marlon Brando|Al Pacino|James Caan
-00000000-0000-0000-0000-000000000004,Goodfellas,1990,Crime|Drama,Robert De Niro|Ray Liotta|Joe Pesci
-00000000-0000-0000-0000-000000000005,The Shawshank Redemption,1994,Drama,Tim Robbins|Morgan Freeman
-00000000-0000-0000-0000-000000000006,The Dark Knight,2008,Action|Crime|Drama|Thriller,Christian Bale|Heath Ledger|Aaron Eckhart
-00000000-0000-0000-0000-000000000007,Pulp Fiction,1994,Crime|Drama|Thriller,John Travolta|Samuel L Jackson|Uma Thurman
-00000000-0000-0000-0000-000000000008,Fight Club,1999,Drama|Thriller,Brad Pitt|Edward Norton|Helena Bonham Carter
-00000000-0000-0000-0000-000000000009,Forrest Gump,1994,Drama|Romance,Tom Hanks|Robin Wright
-00000000-0000-0000-0000-000000000010,The Silence of the Lambs,1991,Crime|Drama|Thriller,Jodie Foster|Anthony Hopkins
-00000000-0000-0000-0000-000000000011,The Green Mile,1999,Crime|Drama|Fantasy,Tom Hanks|Michael Clarke Duncan
-00000000-0000-0000-0000-000000000012,Schindlers List,1993,Drama|History,Liam Neeson|Ben Kingsley|Ralph Fiennes
-00000000-0000-0000-0000-000000000013,The Prestige,2006,Drama|Mystery|Thriller,Christian Bale|Hugh Jackman|Scarlett Johansson
-00000000-0000-0000-0000-000000000014,Interstellar,2014,Drama|Science Fiction,Matthew McConaughey|Anne Hathaway|Jessica Chastain
-00000000-0000-0000-0000-000000000015,Inception,2010,Action|Science Fiction|Thriller,Leonardo DiCaprio|Joseph Gordon-Levitt|Tom Hardy
-00000000-0000-0000-0000-000000000016,The Departed,2006,Crime|Drama|Thriller,Leonardo DiCaprio|Matt Damon|Jack Nicholson
-00000000-0000-0000-0000-000000000017,No Country for Old Men,2007,Crime|Drama|Thriller,Javier Bardem|Josh Brolin|Tommy Lee Jones
-00000000-0000-0000-0000-000000000018,Se7en,1995,Crime|Drama|Mystery|Thriller,Brad Pitt|Morgan Freeman|Kevin Spacey
-00000000-0000-0000-0000-000000000019,Zodiac,2007,Crime|Drama|Mystery|Thriller,Jake Gyllenhaal|Mark Ruffalo|Robert Downey Jr
-00000000-0000-0000-0000-000000000020,Prisoners,2013,Crime|Drama|Mystery|Thriller,Hugh Jackman|Jake Gyllenhaal|Viola Davis
-00000000-0000-0000-0000-000000000021,Heat,1995,Crime|Drama|Thriller,Al Pacino|Robert De Niro|Val Kilmer
-00000000-0000-0000-0000-000000000022,Scarface,1983,Crime|Drama,Al Pacino|Michelle Pfeiffer|Steven Bauer
-00000000-0000-0000-0000-000000000023,Casino,1995,Crime|Drama,Robert De Niro|Sharon Stone|Joe Pesci
-00000000-0000-0000-0000-000000000024,The Wolf of Wall Street,2013,Crime|Drama,Leonardo DiCaprio|Jonah Hill|Margot Robbie
-00000000-0000-0000-0000-000000000025,Taxi Driver,1976,Crime|Drama,Robert De Niro|Jodie Foster|Harvey Keitel
-00000000-0000-0000-0000-000000000026,Blade Runner,1982,Science Fiction|Thriller,Harrison Ford|Rutger Hauer|Sean Young
-00000000-0000-0000-0000-000000000027,Blade Runner 2049,2017,Drama|Science Fiction|Thriller,Ryan Gosling|Harrison Ford|Ana de Armas
-00000000-0000-0000-0000-000000000028,The Matrix,1999,Action|Science Fiction,Keanu Reeves|Laurence Fishburne|Carrie-Anne Moss
-00000000-0000-0000-0000-000000000029,The Terminator,1984,Action|Science Fiction,Arnold Schwarzenegger|Linda Hamilton|Michael Biehn
-00000000-0000-0000-0000-000000000030,Alien,1979,Horror|Science Fiction,Sigourney Weaver|Tom Skerritt|Ian Holm
-00000000-0000-0000-0000-000000000031,Aliens,1986,Action|Horror|Science Fiction,Sigourney Weaver|Michael Biehn|Paul Reiser
-00000000-0000-0000-0000-000000000032,Arrival,2016,Drama|Science Fiction,Amy Adams|Jeremy Renner|Forest Whitaker
-00000000-0000-0000-0000-000000000033,Ex Machina,2014,Drama|Science Fiction|Thriller,Alicia Vikander|Domhnall Gleeson|Oscar Isaac
-00000000-0000-0000-0000-000000000034,Her,2013,Drama|Romance|Science Fiction,Joaquin Phoenix|Amy Adams|Scarlett Johansson
-00000000-0000-0000-0000-000000000035,Gravity,2013,Drama|Science Fiction|Thriller,Sandra Bullock|George Clooney
-00000000-0000-0000-0000-000000000036,Children of Men,2006,Drama|Science Fiction|Thriller,Clive Owen|Julianne Moore|Michael Caine
-00000000-0000-0000-0000-000000000037,The Grand Budapest Hotel,2014,Comedy|Drama,Ralph Fiennes|Tony Revolori|Adrien Brody
-00000000-0000-0000-0000-000000000038,Whiplash,2014,Drama,Miles Teller|J K Simmons
-00000000-0000-0000-0000-000000000039,The Social Network,2010,Drama|History,Jesse Eisenberg|Andrew Garfield|Justin Timberlake
-00000000-0000-0000-0000-000000000040,The Truman Show,1998,Comedy|Drama,Jim Carrey|Laura Linney|Ed Harris
-00000000-0000-0000-0000-000000000041,Eternal Sunshine of the Spotless Mind,2004,Drama|Romance|Science Fiction,Jim Carrey|Kate Winslet|Tom Wilkinson
-00000000-0000-0000-0000-000000000042,Lost in Translation,2003,Drama|Romance,Bill Murray|Scarlett Johansson
-00000000-0000-0000-0000-000000000043,The Shining,1980,Horror|Drama,Jack Nicholson|Shelley Duvall|Danny Lloyd
-00000000-0000-0000-0000-000000000044,The Thing,1982,Horror|Science Fiction|Thriller,Kurt Russell|Keith David|Wilford Brimley
-00000000-0000-0000-0000-000000000045,The Lighthouse,2019,Drama|Horror,Robert Pattinson|Willem Dafoe
-00000000-0000-0000-0000-000000000046,Nope,2022,Horror|Science Fiction|Thriller,Daniel Kaluuya|Keke Palmer|Steven Yeun
-00000000-0000-0000-0000-000000000047,Get Out,2017,Horror|Mystery|Thriller,Daniel Kaluuya|Allison Williams|Bradley Whitford
-00000000-0000-0000-0000-000000000048,The Usual Suspects,1995,Crime|Mystery|Thriller,Kevin Spacey|Gabriel Byrne|Benicio del Toro
-00000000-0000-0000-0000-000000000049,Reservoir Dogs,1992,Crime|Drama|Thriller,Harvey Keitel|Tim Roth|Michael Madsen
-00000000-0000-0000-0000-000000000050,Once Upon a Time in Hollywood,2019,Comedy|Drama,Leonardo DiCaprio|Brad Pitt|Margot Robbie
+MovieId,MovieName,Year,Genres,Artists
+1,The Godfather,1972,Crime|Drama,Marlon Brando|Al Pacino|James Caan
+2,Goodfellas,1990,Crime|Drama,Robert De Niro|Ray Liotta|Joe Pesci
+3,Scarface,1983,Crime|Drama,Al Pacino|Michelle Pfeiffer|Steven Bauer
+4,Heat,1995,Crime|Drama|Thriller,Al Pacino|Robert De Niro|Val Kilmer
+5,The Departed,2006,Crime|Drama|Thriller,Leonardo DiCaprio|Matt Damon|Jack Nicholson
+6,Pulp Fiction,1994,Crime|Drama|Thriller,John Travolta|Samuel L Jackson|Uma Thurman
+7,Taxi Driver,1976,Crime|Drama,Robert De Niro|Jodie Foster|Harvey Keitel
+8,Casino,1995,Crime|Drama,Robert De Niro|Sharon Stone|Joe Pesci
+9,The Wolf of Wall Street,2013,Crime|Drama,Leonardo DiCaprio|Jonah Hill|Margot Robbie
+10,The Silence of the Lambs,1991,Crime|Drama|Thriller,Jodie Foster|Anthony Hopkins
+11,Blade Runner,1982,Drama|Science Fiction|Thriller,Harrison Ford|Rutger Hauer|Sean Young
+12,Blade Runner 2049,2017,Drama|Science Fiction|Thriller,Ryan Gosling|Harrison Ford|Ana de Armas
+13,Inception,2010,Action|Science Fiction|Thriller,Leonardo DiCaprio|Joseph Gordon-Levitt|Tom Hardy
+14,Interstellar,2014,Drama|Science Fiction,Matthew McConaughey|Anne Hathaway|Jessica Chastain
+15,Arrival,2016,Drama|Science Fiction,Amy Adams|Jeremy Renner|Forest Whitaker
+16,Ex Machina,2014,Drama|Science Fiction|Thriller,Alicia Vikander|Domhnall Gleeson|Oscar Isaac
+17,The Matrix,1999,Action|Science Fiction,Keanu Reeves|Laurence Fishburne|Carrie-Anne Moss
+18,Alien,1979,Horror|Science Fiction,Sigourney Weaver|Tom Skerritt|Ian Holm
+19,The Thing,1982,Horror|Science Fiction|Thriller,Kurt Russell|Keith David|Wilford Brimley
+20,Children of Men,2006,Drama|Science Fiction|Thriller,Clive Owen|Julianne Moore|Michael Caine
