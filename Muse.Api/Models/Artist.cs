@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Muse.Api.Models
 {
@@ -10,8 +10,5 @@ namespace Muse.Api.Models
         public string Name { get; set; } = string.Empty;
 
         public ICollection<Song> Songs { get; set; } = new List<Song>();
-        public ICollection<UserPreference> UserPreferences { get; set; } = new List<UserPreference>();
-
-  
     }
 }

@@ -368,3 +368,4 @@ venv/
 .venv/
 env/
 ENV/
+.app/

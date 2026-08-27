@@ -1,4 +1,4 @@
-﻿using Muse.Api.Models;
+using Muse.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography.X509Certificates;
 namespace Muse.Api.Data
@@ -19,8 +19,6 @@ namespace Muse.Api.Data
         public DbSet<Playlist> Playlists => Set<Playlist>();
         public DbSet<PlaylistSong> PlaylistSongs => Set<PlaylistSong>();
         public DbSet<SavedPlaylist> SavedPlaylists => Set<SavedPlaylist>();
-        public DbSet<UserPreference> UserPreferences => Set<UserPreference>();
-        public DbSet<Recommendation> Recommendations => Set<Recommendation>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -85,42 +83,6 @@ namespace Muse.Api.Data
                 .WithMany(p => p.SavedPlaylists)
                 .HasForeignKey(sp => sp.PlaylistId)
                 .OnDelete(DeleteBehavior.Cascade);   // unchanged
-
-            modelBuilder.Entity<UserPreference>()
-                .HasOne(up => up.User)
-                .WithMany(u => u.Preferences)
-                .HasForeignKey(up => up.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<UserPreference>()
-                .HasOne(up => up.Genre)
-                .WithMany(g => g.UserPreferences)
-                .HasForeignKey(up => up.GenreId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<UserPreference>()
-                .HasOne(up => up.Artist)
-                .WithMany(a => a.UserPreferences)
-                .HasForeignKey(up => up.ArtistId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Recommendation>()
-                .HasOne(r => r.User)
-                .WithMany(u => u.Recommendations)
-                .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Restrict);   // was Cascade
-
-            modelBuilder.Entity<Recommendation>()
-                .HasOne(r => r.Movie)
-                .WithMany(m => m.Recommendations)
-                .HasForeignKey(r => r.MovieId)
-                .OnDelete(DeleteBehavior.Restrict);   // was Cascade
-
-            modelBuilder.Entity<Recommendation>()
-                .HasOne(r => r.Song)
-                .WithMany(s => s.Recommendations)
-                .HasForeignKey(r => r.SongId)
-                .OnDelete(DeleteBehavior.Restrict);   // was Cascade
         }
     }
 }
