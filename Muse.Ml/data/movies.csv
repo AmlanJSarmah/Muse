@@ -1,0 +1,21 @@
+MovieId,MovieName,Year,Genres,Artists
+1,The Godfather,1972,Crime|Drama,Marlon Brando|Al Pacino|James Caan
+2,Goodfellas,1990,Crime|Drama,Robert De Niro|Ray Liotta|Joe Pesci
+3,Scarface,1983,Crime|Drama,Al Pacino|Michelle Pfeiffer|Steven Bauer
+4,Heat,1995,Crime|Drama|Thriller,Al Pacino|Robert De Niro|Val Kilmer
+5,The Departed,2006,Crime|Drama|Thriller,Leonardo DiCaprio|Matt Damon|Jack Nicholson
+6,Pulp Fiction,1994,Crime|Drama|Thriller,John Travolta|Samuel L Jackson|Uma Thurman
+7,Taxi Driver,1976,Crime|Drama,Robert De Niro|Jodie Foster|Harvey Keitel
+8,Casino,1995,Crime|Drama,Robert De Niro|Sharon Stone|Joe Pesci
+9,The Wolf of Wall Street,2013,Crime|Drama,Leonardo DiCaprio|Jonah Hill|Margot Robbie
+10,The Silence of the Lambs,1991,Crime|Drama|Thriller,Jodie Foster|Anthony Hopkins
+11,Blade Runner,1982,Drama|Science Fiction|Thriller,Harrison Ford|Rutger Hauer|Sean Young
+12,Blade Runner 2049,2017,Drama|Science Fiction|Thriller,Ryan Gosling|Harrison Ford|Ana de Armas
+13,Inception,2010,Action|Science Fiction|Thriller,Leonardo DiCaprio|Joseph Gordon-Levitt|Tom Hardy
+14,Interstellar,2014,Drama|Science Fiction,Matthew McConaughey|Anne Hathaway|Jessica Chastain
+15,Arrival,2016,Drama|Science Fiction,Amy Adams|Jeremy Renner|Forest Whitaker
+16,Ex Machina,2014,Drama|Science Fiction|Thriller,Alicia Vikander|Domhnall Gleeson|Oscar Isaac
+17,The Matrix,1999,Action|Science Fiction,Keanu Reeves|Laurence Fishburne|Carrie-Anne Moss
+18,Alien,1979,Horror|Science Fiction,Sigourney Weaver|Tom Skerritt|Ian Holm
+19,The Thing,1982,Horror|Science Fiction|Thriller,Kurt Russell|Keith David|Wilford Brimley
+20,Children of Men,2006,Drama|Science Fiction|Thriller,Clive Owen|Julianne Moore|Michael Caine
