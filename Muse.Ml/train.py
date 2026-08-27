@@ -1,204 +1,99 @@
-import joblib
 import pandas as pd
+import joblib
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-DATA_PATH = "data/movies.csv"
+CSV_PATH = "data/movies.csv"
 MODEL_PATH = "model.joblib"
-
-
-# Feature weights
-TITLE_WEIGHT = 1
-GENRE_WEIGHT = 3
-ARTIST_WEIGHT = 2
 
 print("Loading movie dataset...")
 
-df = pd.read_csv(DATA_PATH)
+movies = pd.read_csv(CSV_PATH)
 
 required_columns = [
     "MovieId",
-    "Title",
+    "MovieName",
     "Year",
     "Genres",
     "Artists"
 ]
 
-missing_columns = [
-    column
-    for column in required_columns
-    if column not in df.columns
-]
+for column in required_columns:
 
-if missing_columns:
-    raise ValueError(
-        f"Missing columns in CSV: {missing_columns}"
-    )
+    if column not in movies.columns:
+        raise ValueError(
+            f"Missing required column: {column}"
+        )
 
-for column in [
-    "MovieId",
-    "Title",
-    "Genres",
-    "Artists"
-]:
-
-    df[column] = (
-        df[column]
-        .fillna("")
-        .astype(str)
-        .str.strip()
-    )
-
-df = df[
-    df["MovieId"] != ""
-]
-
-df = df[
-    df["Title"] != ""
-]
-
-before = len(df)
-
-df = df.drop_duplicates(
-    subset=["MovieId"],
-    keep="first"
+movies["MovieName"] = (
+    movies["MovieName"]
+    .fillna("")
+    .astype(str)
 )
 
-after = len(df)
+movies["Genres"] = (
+    movies["Genres"]
+    .fillna("")
+    .astype(str)
+)
 
-if before != after:
+movies["Artists"] = (
+    movies["Artists"]
+    .fillna("")
+    .astype(str)
+)
 
-    print(
-        f"Removed {before - after} duplicate MovieIds."
+movies["Year"] = (
+    pd.to_numeric(
+        movies["Year"],
+        errors="coerce"
     )
+    .fillna(0)
+    .astype(int)
+)
 
-def parse_list(value):
-
-    if not value:
-        return []
-
-    return [
-        item.strip()
-        for item in str(value).split("|")
-        if item.strip()
-    ]
-
-def create_features(row):
-
-    title = row["Title"]
-
-    genres = parse_list(
-        row["Genres"]
-    )
-
-    artists = parse_list(
-        row["Artists"]
-    )
-
-
-    title_features = " ".join(
-        [title] * TITLE_WEIGHT
-    )
-
-
-    genre_features = " ".join(
-        genres * GENRE_WEIGHT
-    )
-
-
-    artist_features = " ".join(
-        artists * ARTIST_WEIGHT
-    )
-
-
-    return (
-        title_features
-        + " "
-        + genre_features
-        + " "
-        + artist_features
-    )
-
-
-df["Features"] = df.apply(
-    create_features,
-    axis=1
+movies["combined_features"] = (
+    movies["MovieName"]
+    + " "
+    + movies["Genres"].str.replace("|", " ", regex=False)
+    + " "
+    + movies["Artists"].str.replace("|", " ", regex=False)
 )
 
 print("Training TF-IDF model...")
 
 vectorizer = TfidfVectorizer(
-    lowercase=True,
-    stop_words="english",
-    ngram_range=(1, 2),
-    min_df=1
+    stop_words="english"
 )
-
 
 tfidf_matrix = vectorizer.fit_transform(
-    df["Features"]
+    movies["combined_features"]
 )
 
-print("Calculating cosine similarity...")
+print("Calculating similarity matrix...")
 
 similarity_matrix = cosine_similarity(
     tfidf_matrix
 )
 
 model = {
-
-    "movies": df[
-        [
-            "MovieId",
-            "Title",
-            "Year",
-            "Genres",
-            "Artists"
-        ]
-    ],
-
-    "vectorizer":
-        vectorizer,
-
-    "tfidf_matrix":
-        tfidf_matrix,
-
-    "similarity_matrix":
-        similarity_matrix,
-
-    "weights":
-    {
-        "title": TITLE_WEIGHT,
-        "genre": GENRE_WEIGHT,
-        "artist": ARTIST_WEIGHT
-    }
+    "movies": movies,
+    "vectorizer": vectorizer,
+    "tfidf_matrix": tfidf_matrix,
+    "similarity_matrix": similarity_matrix
 }
-
 
 joblib.dump(
     model,
     MODEL_PATH
 )
 
-print()
-print("--------------------------------------------")
-print("MUSE ML MODEL TRAINED")
-print("--------------------------------------------")
-print(f"Movies: {len(df)}")
+
 print(
-    f"Features: {tfidf_matrix.shape[1]}"
+    f"Model saved to {MODEL_PATH}"
 )
+
 print(
-    f"Title weight: {TITLE_WEIGHT}"
+    f"Trained on {len(movies)} movies."
 )
-print(
-    f"Genre weight: {GENRE_WEIGHT}"
-)
-print(
-    f"Artist weight: {ARTIST_WEIGHT}"
-)
-print(
-    f"Model saved: {MODEL_PATH}"
-)
-print("--------------------------------------------")
