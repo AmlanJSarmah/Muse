@@ -73,7 +73,7 @@ export const PlaylistDetailPage: React.FC = () => {
         };
 
         void loadPlaylist();
-    }, [id]);
+    }, [id, isAuthenticated]);
 
     const handleSave = async () => {
         if (!playlist) return;

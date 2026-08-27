@@ -7,22 +7,28 @@ import type {
 import { playlistService } from '../services/apiClient';
 import { useAuth } from '../context/AuthContext';
 
-const PlaylistList: React.FC<{
+interface PlaylistListProps {
     items: LibraryPlaylist[];
-    savedList?: boolean;
-    onUnsave?: (id: string) => void;
-    removingId?: string | null;
-}> = ({
+    createdByMe?: boolean;
+    onDelete?: (id: string) => void;
+    deletingId?: string | null;
+}
+
+const PlaylistList: React.FC<PlaylistListProps> = ({
     items,
-    savedList = false,
-    onUnsave,
-    removingId,
-}) => (
-    items.length === 0 ? (
-        <p style={{ color: '#888' }}>
-            None yet.
-        </p>
-    ) : (
+    createdByMe = false,
+    onDelete,
+    deletingId,
+}) => {
+    if (items.length === 0) {
+        return (
+            <p style={{ color: '#888' }}>
+                None yet.
+            </p>
+        );
+    }
+
+    return (
         <div
             style={{
                 display: 'grid',
@@ -68,96 +74,134 @@ const PlaylistList: React.FC<{
                         </div>
                     </Link>
 
-                    {savedList && onUnsave && (
-                        <button
-                            type="button"
-                            onClick={() =>
-                                onUnsave(playlist.id)
-                            }
-                            disabled={
-                                removingId === playlist.id
-                            }
-                            style={{
-                                flexShrink: 0,
-                                padding: '8px 12px',
-                                borderRadius: 6,
-                                border: '1px solid #444',
-                                background: '#222',
-                                color: '#fff',
-                                cursor:
-                                    removingId === playlist.id
-                                        ? 'default'
-                                        : 'pointer',
-                            }}
-                        >
-                            {removingId === playlist.id
-                                ? 'Removing...'
-                                : 'Remove'}
-                        </button>
-                    )}
+                    {createdByMe &&
+                        onDelete && (
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    onDelete(
+                                        playlist.id
+                                    )
+                                }
+                                disabled={
+                                    deletingId ===
+                                    playlist.id
+                                }
+                                style={{
+                                    flexShrink: 0,
+                                    padding:
+                                        '8px 14px',
+                                    borderRadius: 6,
+                                    border:
+                                        '1px solid #444',
+                                    background:
+                                        '#222',
+                                    color: '#fff',
+                                    cursor:
+                                        deletingId ===
+                                        playlist.id
+                                            ? 'default'
+                                            : 'pointer',
+                                }}
+                            >
+                                {deletingId ===
+                                playlist.id
+                                    ? 'Deleting...'
+                                    : 'Delete'}
+                            </button>
+                        )}
                 </div>
             ))}
         </div>
-    )
-);
+    );
+};
 
 export const LibraryPage: React.FC = () => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated } =
+        useAuth();
 
     const [library, setLibrary] =
-        useState<LibraryResponse | null>(null);
+        useState<LibraryResponse | null>(
+            null
+        );
 
     const [error, setError] =
         useState<string | null>(null);
 
-    const [removingId, setRemovingId] =
+    const [deletingId, setDeletingId] =
         useState<string | null>(null);
 
     useEffect(() => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated) {
+            return;
+        }
 
-        playlistService
-            .getMyLibrary()
-            .then(setLibrary)
-            .catch((err) =>
-                setError(
-                    err instanceof Error
-                        ? err.message
-                        : 'Unable to load library.'
-                )
-            );
+        const loadLibrary =
+            async () => {
+                try {
+                    setError(null);
+
+                    const data =
+                        await playlistService.getMyLibrary();
+
+                    setLibrary(data);
+                } catch (err) {
+                    setError(
+                        err instanceof Error
+                            ? err.message
+                            : 'Unable to load library.'
+                    );
+                }
+            };
+
+        void loadLibrary();
     }, [isAuthenticated]);
 
-    const handleUnsave = async (
+    const handleDelete = async (
         playlistId: string
     ) => {
-        setRemovingId(playlistId);
+        const confirmed =
+            window.confirm(
+                'Are you sure you want to delete this playlist?'
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        setDeletingId(playlistId);
+        setError(null);
 
         try {
-            await playlistService.unsavePlaylist(
+            await playlistService.deletePlaylist(
                 playlistId
             );
 
-            setLibrary((current) =>
-                current
-                    ? {
-                          ...current,
-                          saved: current.saved.filter(
-                              (playlist) =>
-                                  playlist.id !==
-                                  playlistId
-                          ),
-                      }
-                    : current
-            );
+            // Remove the deleted playlist
+            // immediately from Created by Me.
+            setLibrary((current) => {
+                if (!current) {
+                    return current;
+                }
+
+                return {
+                    ...current,
+                    created:
+                        current.created.filter(
+                            (playlist) =>
+                                playlist.id !==
+                                playlistId
+                        ),
+                };
+            });
         } catch (err) {
             setError(
                 err instanceof Error
                     ? err.message
-                    : 'Unable to remove playlist from your saved list.'
+                    : 'Unable to delete playlist.'
             );
         } finally {
-            setRemovingId(null);
+            setDeletingId(null);
         }
     };
 
@@ -180,19 +224,9 @@ export const LibraryPage: React.FC = () => {
                         marginTop: 8,
                     }}
                 >
-                    Please log in to view your playlists.
+                    Please log in to view your
+                    playlists.
                 </p>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div
-                className="page-container"
-                style={{ color: '#ff7676' }}
-            >
-                {error}
             </div>
         );
     }
@@ -222,32 +256,57 @@ export const LibraryPage: React.FC = () => {
                 My Library
             </h2>
 
+            {error && (
+                <div
+                    style={{
+                        color: '#ff7676',
+                        marginBottom: 20,
+                    }}
+                >
+                    {error}
+                </div>
+            )}
+
+            {/* CREATED PLAYLISTS */}
             <section
-                style={{ marginBottom: 32 }}
+                style={{
+                    marginBottom: 32,
+                }}
             >
                 <h3
-                    style={{ marginBottom: 14 }}
+                    style={{
+                        marginBottom: 14,
+                    }}
                 >
                     Created by Me
                 </h3>
 
                 <PlaylistList
                     items={library.created}
+                    createdByMe={true}
+                    onDelete={handleDelete}
+                    deletingId={deletingId}
                 />
             </section>
 
+            {/* SAVED PLAYLISTS */}
             <section>
                 <h3
-                    style={{ marginBottom: 14 }}
+                    style={{
+                        marginBottom: 14,
+                    }}
                 >
                     Saved Playlists
                 </h3>
 
+                {/* 
+                    IMPORTANT:
+                    There is intentionally NO Remove button here.
+
+                    
+                */}
                 <PlaylistList
                     items={library.saved}
-                    savedList
-                    onUnsave={handleUnsave}
-                    removingId={removingId}
                 />
             </section>
         </div>
