@@ -187,6 +187,19 @@ export const playlistService = {
         }
     },
 
+    async unsavePlaylist(id: string): Promise<void> {
+        try {
+            await apiClient.delete(`/api/playlists/${id}/save`);
+        } catch (error) {
+            throw new Error(
+                getApiError(
+                    error,
+                    'Unable to remove playlist from your saved list.'
+                )
+            );
+        }
+    },
+
     async setVisibility(
         id: string,
         isPublic: boolean
