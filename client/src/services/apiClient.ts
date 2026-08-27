@@ -9,7 +9,9 @@ import type {
 
 export const apiClient = axios.create({
     baseURL: 'http://localhost:5235',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
 apiClient.interceptors.request.use((config) => {
@@ -22,10 +24,16 @@ apiClient.interceptors.request.use((config) => {
     return config;
 });
 
-const getApiError = (error: unknown, fallback: string): string => {
+const getApiError = (
+    error: unknown,
+    fallback: string
+): string => {
     if (axios.isAxiosError(error)) {
         const data = error.response?.data as
-            | { error?: string; errors?: Record<string, string[]> }
+            | {
+                  error?: string;
+                  errors?: Record<string, string[]>;
+              }
             | undefined;
 
         if (typeof data?.error === 'string') {
@@ -33,7 +41,11 @@ const getApiError = (error: unknown, fallback: string): string => {
         }
 
         if (data?.errors) {
-            return Object.values(data.errors).flat().join(' ') || fallback;
+            return (
+                Object.values(data.errors)
+                    .flat()
+                    .join(' ') || fallback
+            );
         }
 
         if (error.response?.status === 401) {
@@ -49,20 +61,27 @@ const getApiError = (error: unknown, fallback: string): string => {
 };
 
 export const authService = {
-    async login(email: string, password: string): Promise<AuthResponse> {
+    async login(
+        email: string,
+        password: string
+    ): Promise<AuthResponse> {
         try {
-            const response = await apiClient.post<AuthResponse>(
-                '/api/auth/signin',
-                {
-                    email,
-                    password,
-                }
-            );
+            const response =
+                await apiClient.post<AuthResponse>(
+                    '/api/auth/signin',
+                    {
+                        email,
+                        password,
+                    }
+                );
 
             return response.data;
         } catch (error) {
             throw new Error(
-                getApiError(error, 'Invalid email or password.')
+                getApiError(
+                    error,
+                    'Invalid email or password.'
+                )
             );
         }
     },
@@ -73,33 +92,40 @@ export const authService = {
         password: string
     ): Promise<AuthResponse> {
         try {
-            const response = await apiClient.post<AuthResponse>(
-                '/api/auth/signup',
-                {
-                    username,
-                    email,
-                    password,
-                }
-            );
+            const response =
+                await apiClient.post<AuthResponse>(
+                    '/api/auth/signup',
+                    {
+                        username,
+                        email,
+                        password,
+                    }
+                );
 
             return response.data;
         } catch (error) {
             throw new Error(
-                getApiError(error, 'Unable to create the account.')
+                getApiError(
+                    error,
+                    'Unable to create the account.'
+                )
             );
         }
     },
 };
 
 export const movieService = {
-    async getSoundtrack(title: string): Promise<SoundtrackResponse> {
+    async getSoundtrack(
+        title: string
+    ): Promise<SoundtrackResponse> {
         try {
-            const response = await apiClient.get<SoundtrackResponse>(
-                '/app/songs',
-                {
-                    params: { title },
-                }
-            );
+            const response =
+                await apiClient.get<SoundtrackResponse>(
+                    '/app/songs',
+                    {
+                        params: { title },
+                    }
+                );
 
             return response.data;
         } catch (error) {
@@ -163,38 +189,75 @@ export const playlistService = {
         }
     },
 
-    async getPlaylistById(id: string): Promise<Playlist> {
+    async getPlaylistById(
+        id: string
+    ): Promise<Playlist> {
         try {
-            const response = await apiClient.get<Playlist>(
-                `/api/playlists/${id}`
-            );
+            const response =
+                await apiClient.get<Playlist>(
+                    `/api/playlists/${id}`
+                );
 
             return response.data;
         } catch (error) {
             throw new Error(
-                getApiError(error, 'Unable to load playlist.')
+                getApiError(
+                    error,
+                    'Unable to load playlist.'
+                )
             );
         }
     },
 
-    async savePlaylist(id: string): Promise<void> {
+    async savePlaylist(
+        id: string
+    ): Promise<void> {
         try {
-            await apiClient.post(`/api/playlists/${id}/save`);
+            await apiClient.post(
+                `/api/playlists/${id}/save`
+            );
         } catch (error) {
             throw new Error(
-                getApiError(error, 'Unable to save playlist.')
+                getApiError(
+                    error,
+                    'Unable to save playlist.'
+                )
             );
         }
     },
 
-    async unsavePlaylist(id: string): Promise<void> {
+    // Removes the current user's bookmark.
+    // It does NOT delete the playlist.
+    async unsavePlaylist(
+        id: string
+    ): Promise<void> {
         try {
-            await apiClient.delete(`/api/playlists/${id}/save`);
+            await apiClient.delete(
+                `/api/playlists/${id}/save`
+            );
         } catch (error) {
             throw new Error(
                 getApiError(
                     error,
                     'Unable to remove playlist from your saved list.'
+                )
+            );
+        }
+    },
+
+    // Deletes a playlist created by the current user.
+    async deletePlaylist(
+        id: string
+    ): Promise<void> {
+        try {
+            await apiClient.delete(
+                `/api/playlists/${id}`
+            );
+        } catch (error) {
+            throw new Error(
+                getApiError(
+                    error,
+                    'Unable to delete playlist.'
                 )
             );
         }
@@ -207,7 +270,9 @@ export const playlistService = {
         try {
             await apiClient.patch(
                 `/api/playlists/${id}/visibility`,
-                { isPublic }
+                {
+                    isPublic,
+                }
             );
         } catch (error) {
             throw new Error(
