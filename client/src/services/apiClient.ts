@@ -2,6 +2,7 @@ import axios from 'axios';
 import type {
     AuthResponse,
     LibraryResponse,
+    MyRecommendationInfoResponse,
     Playlist,
     PlaylistSearchResponse,
     SoundtrackResponse,
@@ -145,13 +146,14 @@ export const movieService = {
         songCount: number;
     }> {
         try {
-            const response = await apiClient.post(
-                '/app/songs/save',
-                null,
-                {
-                    params: { title },
-                }
-            );
+            const response =
+                await apiClient.post(
+                    '/app/songs/save',
+                    null,
+                    {
+                        params: { title },
+                    }
+                );
 
             return response.data;
         } catch (error) {
@@ -226,8 +228,6 @@ export const playlistService = {
         }
     },
 
-    // Removes the current user's bookmark.
-    // It does NOT delete the playlist.
     async unsavePlaylist(
         id: string
     ): Promise<void> {
@@ -245,7 +245,6 @@ export const playlistService = {
         }
     },
 
-    // Deletes a playlist created by the current user.
     async deletePlaylist(
         id: string
     ): Promise<void> {
@@ -297,6 +296,25 @@ export const playlistService = {
                 getApiError(
                     error,
                     'Unable to load your library.'
+                )
+            );
+        }
+    },
+
+    
+    async getMyRecommendationMovieInfo(): Promise<MyRecommendationInfoResponse> {
+        try {
+            const response =
+                await apiClient.get<MyRecommendationInfoResponse>(
+                    '/api/playlists/mine/movie-info'
+                );
+
+            return response.data;
+        } catch (error) {
+            throw new Error(
+                getApiError(
+                    error,
+                    'Unable to load movie information for recommendations.'
                 )
             );
         }
